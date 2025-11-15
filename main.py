@@ -93,6 +93,7 @@ def main() -> None:
         sx, sy = to_world(mx, my, camera)
         _c = get_sprite('_template').get_at(((mx - camera.x * tile_size.x) % tile_size.x, (my - camera.y * tile_size.y) % tile_size.y))
         
+        # cringe
         match _c.r, _c.g, _c.b:
             case 255, 0, 0:
                 sx -= 1
@@ -113,12 +114,15 @@ def main() -> None:
                 # if the 'X' is pressed, close the window
                 running = False
             
-            click_valid: bool = manager.handle_event(event, mx, my)
+            # manager tells whether or not it ate the event
+            event_valid: bool = manager.handle_event(event, mx, my)
 
-            if click_valid:
+            if event_valid:
+                # we want to process the event here
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     # RMB used on world tile
                     if event.button == 3:
+                        # show WIP status menu
                         w = UIStatusMenu("Status", "Cabrón", pygame.Rect(mx - 80, my - 100, 160, 200))
                         manager.windows.append(w)
                         manager.put_on_top(w)
