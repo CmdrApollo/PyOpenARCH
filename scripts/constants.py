@@ -7,12 +7,12 @@ pygame.init()
 Vec2 = pygame.Vector2
 
 # the path to the font used by the game
-fontname = "courier"
+fontname = "assets/fonts/RobotoMono-Regular.ttf"
 
 # font constants
-SMALL_FONT = pygame.font.SysFont(fontname, 24)
-FONT = pygame.font.SysFont(fontname, 26)
-BIG_FONT = pygame.font.SysFont(fontname, 30)
+SMALL_FONT = pygame.font.Font(fontname, 16)
+FONT = pygame.font.Font(fontname, 20)
+BIG_FONT = pygame.font.Font(fontname, 24)
 
 # the name of the game
 gamename = "PyOpenARCH"
