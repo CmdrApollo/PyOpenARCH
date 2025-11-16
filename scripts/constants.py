@@ -10,9 +10,9 @@ Vec2 = pygame.Vector2
 fontname = "assets/fonts/RobotoMono-Regular.ttf"
 
 # font constants
-SMALL_FONT = pygame.font.Font(fontname, 16)
-FONT = pygame.font.Font(fontname, 20)
-BIG_FONT = pygame.font.Font(fontname, 24)
+small_font = pygame.font.Font(fontname, 16)
+font = pygame.font.Font(fontname, 20)
+big_font = pygame.font.Font(fontname, 24)
 
 # the name of the game
 gamename = "PyOpenARCH"

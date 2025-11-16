@@ -41,7 +41,9 @@ def main() -> None:
 
     # the actual tiles
     # TODO move to a class along with world size
-    tiles = [[WaterTile(i, j, None) for i in range(world_width)] for j in range(world_height)]
+    # generate ocean tiles by converting a one-dimensional
+    # i-value to an (x,y) coordinate
+    tiles = [OceanTile(i % world_width, i // world_width, None) for i in range(world_width * world_height)]
 
     # perlin noise objects
     # TODO no magic numbers
@@ -60,19 +62,22 @@ def main() -> None:
 
             # TODO no magic numbers
             if n < 0.4:
-                t = DeepWaterTile
+                t = DeepOceanTile
             elif n < 0.5:
-                t = WaterTile
+                t = OceanTile
             elif n < 0.52:
-                t = SandTile
+                t = BeachTile
             else:
                 if forest_noise((x / world_width, y / world_height)) < 0:
-                    t = GrassTile
+                    t = PlainsTile
                 else:
                     t = ForestTile
 
             # setting the tile
-            tiles[y][x] = t(x, y, None)
+            tiles[y * world_width + x] = t(x, y, None)
+
+    def get_tile(x: int, y: int) -> Tile:
+        return tiles[y * world_width + x]
 
     # UI manager
     window_manager = WindowManager((width, height), [
@@ -87,6 +92,8 @@ def main() -> None:
         UIButton(120, 40, 32, get_sprite("icon_system"))
     ]
 
+    camera_drag: bool = False
+
     # main loop
     running = True
     while running:
@@ -100,7 +107,7 @@ def main() -> None:
         sx, sy = to_world(mx, my, camera)
         _c = get_sprite('_template').get_at(((mx - camera.x * tile_size.x) % tile_size.x, (my - camera.y * tile_size.y) % tile_size.y))
         
-        # cringe
+        # TODO cringe
         match _c.r, _c.g, _c.b:
             case 255, 0, 0:
                 sx -= 1
@@ -121,23 +128,34 @@ def main() -> None:
                 # if the 'X' is pressed, close the window
                 running = False
             
-            # manager tells whether or not it ate the event
-            event_valid: bool = window_manager.handle_event(event, mx, my)
+            if camera_drag:
+                # if panning the camera, don't let the window
+                # manager eat the event
+                event_valid: bool = True
+            else:
+                # manager tells whether or not it ate the event
+                event_valid: bool = window_manager.handle_event(event, mx, my)
 
             if event_valid:
                 # we want to process the event here
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    # RMB used on world tile
-                    if event.button == 3:
+                    if event.button == 2:
+                        # middle mouse clicked on world tile
+                        camera_drag = True
+                    elif event.button == 3:
+                        # RMB used on world tile
                         # show WIP status menu
-                        window_manager.add_window(UIStatusMenu("Status", "Cabrón", pygame.Rect(mx - 80, my - 100, 160, 200)))
-
-        # master list of keys
-        keys = pygame.key.get_pressed()
-
-        # move the camera based on WASD
-        camera.x -= delta * (keys[pygame.K_d] - keys[pygame.K_a]) * 8
-        camera.y -= delta * (keys[pygame.K_s] - keys[pygame.K_w]) * 8
+                        tile: Tile = get_tile(sx, sy)
+                        window_manager.add_window(UIStatusMenu(all_text["TITLE_STATUS"], f"{all_text["TERRAIN"]}: {all_text[tile.terrain]}", pygame.Rect(mx - 80, my - 100, 160, 200)))
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    if event.button == 2:
+                        # let go of middle mouse so stop dragging
+                        camera_drag = False
+                elif event.type == pygame.MOUSEMOTION:
+                    if camera_drag:
+                        # middle mouse drag, pan camera
+                        camera.x += event.rel[0] / tile_size.x
+                        camera.y += event.rel[1] / tile_size.y
 
         # drawing routine
         # fill the screen the same color as the dark water
@@ -147,13 +165,15 @@ def main() -> None:
         for x in range(world_width):
             for y in range(world_height):
                 screen_x, screen_y = to_screen(x, y, camera)
-                screen.blit(get_sprite(tiles[y][x].graphic), (screen_x, screen_y))
+                screen.blit(get_sprite(get_tile(x, y).graphic), (screen_x, screen_y))
 
         # draw the selection marker
         screen.blit(get_sprite('select'), to_screen(sx, sy, camera))
 
+        # draw the windows to the screen
         window_manager.draw(screen)
 
+        # draw each ui button to the screen
         for button in buttons:
             button.draw(screen)
 

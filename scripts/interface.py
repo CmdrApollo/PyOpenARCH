@@ -17,8 +17,8 @@ class UIWindow:
 
     def draw(self, screen: pygame.Surface) -> None:
         # make text surfaces
-        title = SMALL_FONT.render(self.title, True, "white", wraplength=self.rect.width-20)
-        body = FONT.render(self.body, True, "white", wraplength=self.rect.width-20)
+        title = small_font.render(self.title, True, "white", wraplength=self.rect.width-20)
+        body = font.render(self.body, True, "white", wraplength=self.rect.width-20)
         # draw rectangles
         pygame.draw.rect(screen, 'black', self.rect)
         pygame.draw.rect(screen, 'white', self.rect, 1)
@@ -29,7 +29,7 @@ class UIWindow:
         screen.blit(title, (self.rect.x + 10, self.rect.y + 10))
         screen.blit(body, (self.rect.x + 10, self.rect.y + title.height + 30))
         # blit red 'X'
-        screen.blit(s := SMALL_FONT.render('X', True, 'red' if self.can_close else 'gray'), (self.rect.right - s.width - 10, self.rect.y + 10))
+        screen.blit(s := small_font.render('X', True, 'red' if self.can_close else 'gray'), (self.rect.right - s.width - 10, self.rect.y + 10))
 
     def handle_event(self, manager, event: pygame.Event, mx: int, my: int):
         # 'internal x' and 'internal y' (i.e. how far into the window the mouse is)
@@ -66,8 +66,8 @@ class UIStatusMenu(UIWindow):
 
     def draw(self, screen: pygame.Surface) -> None:
         # make text surfaces
-        title = SMALL_FONT.render(self.title, True, "white", wraplength=self.rect.width-20)
-        body = FONT.render(self.body, True, "white", wraplength=self.rect.width-20)
+        title = small_font.render(self.title, True, "white", wraplength=self.rect.width-20)
+        body = font.render(self.body, True, "white", wraplength=self.rect.width-20)
         # draw rectangles
         pygame.draw.rect(screen, 'black', self.rect)
         pygame.draw.rect(screen, 'white', self.rect, 1)
@@ -80,7 +80,7 @@ class UIStatusMenu(UIWindow):
 
 # main window management class
 class WindowManager:
-    def __init__(self, size: tuple[int, int], windows: list[UIWindow]):
+    def __init__(self, size: tuple[int, int], windows: list[UIWindow]) -> None:
         self.width, self.height = size
         self.windows = windows
     
@@ -90,11 +90,11 @@ class WindowManager:
         for w in self.windows:
             w.draw(screen)
     
-    def add_window(self, window: UIWindow):
+    def add_window(self, window: UIWindow) -> None:
         self.windows.append(window)
         self.put_on_top(window)
 
-    def put_on_top(self, window: UIWindow):
+    def put_on_top(self, window: UIWindow) -> None:
         # make the selected window have an infinite z value
         window.z_value = float('inf')
 
@@ -115,12 +115,22 @@ class WindowManager:
             if w.rect.collidepoint(mx, my):
                 window = w
             elif isinstance(w, UIStatusMenu):
+                # status menus specifically go away
+                # when the mouse isn't over them
                 w.to_remove = True
         
         # get rid of dead windows
+        # (should be status windows only)
         for w in self.windows[::-1]:
             if w.to_remove:
                 self.windows.remove(w)
+        
+        if window not in self.windows:
+            # this should not occur, but if
+            # it does, exit the function and
+            # let the main file take care of
+            # the event
+            return True
         
         # if a window is hovered over,
         # let it handle the event
@@ -138,13 +148,17 @@ class WindowManager:
         # no window ate the click
         return True
 
+# circular buttons on the top of the screen
 class UIButton:
     def __init__(self, x: int, y: int, r: int, icon: pygame.Surface = None):
         self.position = Vec2(x, y)
         self.radius = r
         self.icon = icon
     
-    def draw(self, screen):
+    def draw(self, screen: pygame.Surface):
+        # draw a black circle with a white outline
         pygame.draw.circle(screen, 'black', self.position, self.radius)
         pygame.draw.circle(screen, 'white', self.position, self.radius, 1)
-        screen.blit(self.icon, (self.position.x - self.icon.width / 2, self.position.y - self.icon.height / 2))
+        if self.icon is not None:
+            # blit the icon to the screen if it exists
+            screen.blit(self.icon, (self.position.x - self.icon.width / 2, self.position.y - self.icon.height / 2))
