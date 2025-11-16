@@ -1,5 +1,9 @@
 import pygame
 from .constants import *
+from .text import all_text
+from .tile import Tile
+
+from typing import Callable
 
 # main UI window class
 class UIWindow:
@@ -31,7 +35,7 @@ class UIWindow:
         # blit red 'X'
         screen.blit(s := small_font.render('X', True, 'red' if self.can_close else 'gray'), (self.rect.right - s.width - 10, self.rect.y + 10))
 
-    def handle_event(self, manager, event: pygame.Event, mx: int, my: int):
+    def handle_event(self, manager, event: pygame.Event, mx: int, my: int) -> None:
         # 'internal x' and 'internal y' (i.e. how far into the window the mouse is)
         ix, iy = mx - self.rect.x, my - self.rect.y
 
@@ -67,7 +71,7 @@ class UIStatusMenu(UIWindow):
     def draw(self, screen: pygame.Surface) -> None:
         # make text surfaces
         title = small_font.render(self.title, True, "white", wraplength=self.rect.width-20)
-        body = font.render(self.body, True, "white", wraplength=self.rect.width-20)
+        body = small_font.render(self.body, True, "white", wraplength=self.rect.width-20)
         # draw rectangles
         pygame.draw.rect(screen, 'black', self.rect)
         pygame.draw.rect(screen, 'white', self.rect, 1)
@@ -84,13 +88,19 @@ class WindowManager:
         self.width, self.height = size
         self.windows = windows
     
+        self.dragging = False
+
     def draw(self, screen: pygame.Surface) -> None:
         # call draw method on all windows which are sorted by
         # z_value in the handle_event method on this class
         for w in self.windows:
             w.draw(screen)
     
+    def add_status_menu(self, tile: Tile, mx: int, my: int) -> None:
+        self.add_window(UIStatusMenu(all_text["TITLE_STATUS"], f"{all_text["TERRAIN"]}: {all_text[tile.terrain]}", pygame.Rect(mx - 80, my - 100, 160, 200)))
+
     def add_window(self, window: UIWindow) -> None:
+        window.to_remove = False
         self.windows.append(window)
         self.put_on_top(window)
 
@@ -137,6 +147,8 @@ class WindowManager:
         if window is not None:
             window.handle_event(self, event, mx, my)
 
+            self.dragging = window.dragging
+
             # remove a window if it requests
             # to be gone
             if window.to_remove:
@@ -150,15 +162,59 @@ class WindowManager:
 
 # circular buttons on the top of the screen
 class UIButton:
-    def __init__(self, x: int, y: int, r: int, icon: pygame.Surface = None):
+    def __init__(self, x: int, y: int, r: int, icon: pygame.Surface = None, function: Callable = None) -> None:
         self.position = Vec2(x, y)
         self.radius = r
+
+        self.rect = pygame.Rect(self.position.x - self.radius, self.position.y - self.radius, self.radius * 2, self.radius * 2)
+
         self.icon = icon
+        self.function = function
     
-    def draw(self, screen: pygame.Surface):
+    def draw(self, screen: pygame.Surface) -> None:
         # draw a black circle with a white outline
         pygame.draw.circle(screen, 'black', self.position, self.radius)
         pygame.draw.circle(screen, 'white', self.position, self.radius, 1)
         if self.icon is not None:
             # blit the icon to the screen if it exists
             screen.blit(self.icon, (self.position.x - self.icon.width / 2, self.position.y - self.icon.height / 2))
+
+    def handle_event(self, manager, event: pygame.Event, mx: int, my: int) -> None:
+        # TODO maybe temp?
+        # on left click, if this object
+        # has a callback, call it
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1 and self.function is not None:
+                self.function()
+
+# main button management class
+class ButtonManager:
+    def __init__(self, buttons: list[UIButton]) -> None:
+        self.buttons = buttons
+    
+    def draw(self, screen: pygame.Surface) -> None:
+        # call draw method on all buttons
+        for b in self.buttons:
+            b.draw(screen)
+    
+    def add_button(self, button: UIButton) -> None:
+        self.buttons.append(button)
+
+    def handle_event(self, event: pygame.Event, mx: int, my: int) -> bool:
+        # top most button under mouse gets selected
+        button = None
+        for b in self.buttons:
+            if b.rect.collidepoint(mx, my):
+                button = b
+                break
+        
+        # if a button is hovered over,
+        # let it handle the event
+        if button is not None:
+            button.handle_event(self, event, mx, my)
+            
+            # return false because a button ate the click
+            return False
+    
+        # no button ate the click
+        return True

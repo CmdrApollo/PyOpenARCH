@@ -32,18 +32,19 @@ def main() -> None:
     clock = pygame.time.Clock()
     delta: float = 0.0
 
-    # camera position
-    camera = Vec2(10, -32)
+    # camera variables
+    camera: Vec2 = Vec2(10, -32)
+    camera_drag: bool = False
 
     # world size
-    world_width = 100
-    world_height = 100
+    world_width: int = 100
+    world_height: int = 100
 
     # the actual tiles
     # TODO move to a class along with world size
     # generate ocean tiles by converting a one-dimensional
     # i-value to an (x,y) coordinate
-    tiles = [OceanTile(i % world_width, i // world_width, None) for i in range(world_width * world_height)]
+    tiles: list[Tile] = [OceanTile(i % world_width, i // world_width, None) for i in range(world_width * world_height)]
 
     # perlin noise objects
     # TODO no magic numbers
@@ -56,9 +57,9 @@ def main() -> None:
     for x in range(world_width):
         for y in range(world_height):
             # distance from center of the world
-            d = 1 - (math.sqrt(pow(x - world_width / 2, 2) + pow(y - world_height / 2 , 2)) / math.hypot(world_width / 2, world_height / 2))
+            d: float = 1 - (math.sqrt(pow(x - world_width / 2, 2) + pow(y - world_height / 2 , 2)) / math.hypot(world_width / 2, world_height / 2))
             # scaled noise value based on distance
-            n = ((1 + base_noise.noise((x / world_width, y / world_height))) / 2) * pow(d, 1.0 / 3.0)
+            n: float = ((1 + base_noise.noise((x / world_width, y / world_height))) / 2) * pow(d, 1.0 / 3.0)
 
             # TODO no magic numbers
             if n < 0.4:
@@ -76,29 +77,35 @@ def main() -> None:
             # setting the tile
             tiles[y * world_width + x] = t(x, y, None)
 
+    # helper for doing silly math
     def get_tile(x: int, y: int) -> Tile:
         return tiles[y * world_width + x]
 
+    # window that needs to be referenced multipe times
+    welcome_window = UIWindow(all_text["TITLE_WELCOME"], all_text["BODY_WELCOME"], pygame.Rect(width // 2 - 320, height // 2 - 240, 640, 480))
+
     # UI manager
     window_manager = WindowManager((width, height), [
-        UIWindow(all_text["TITLE_WELCOME"], all_text["BODY_WELCOME"], pygame.Rect(width // 2 - 320, height // 2 - 240, 640, 480)),
+        welcome_window,
         UIWindow(all_text["TITLE_TUTORIAL"], all_text["BODY_TUTORIAL"], pygame.Rect(width // 2 - 200, height // 2 - 150, 400, 300)),
     ])
 
-    # buttons
-    # TODO make button manager class
-    buttons = [
-        UIButton(40, 40, 32, get_sprite("icon_menu")),
-        UIButton(120, 40, 32, get_sprite("icon_system"))
-    ]
+    # function for the journal button
+    def show_welcome():
+        if welcome_window not in window_manager.windows:
+            window_manager.add_window(welcome_window)
 
-    camera_drag: bool = False
+    # button manager
+    button_manager = ButtonManager([
+        UIButton(40, 40, 32, get_sprite("icon_menu")),
+        UIButton(120, 40, 32, get_sprite("icon_journal"), show_welcome)
+    ])
 
     # main loop
     running = True
     while running:
         # calculate delta-time with clock object
-        delta = clock.tick_busy_loop(60) / 1000
+        delta = clock.tick_busy_loop(60.0) / 1000.0
 
         # get mouse position at the start of the frame
         mx, my = pygame.mouse.get_pos()
@@ -107,7 +114,7 @@ def main() -> None:
         sx, sy = to_world(mx, my, camera)
         _c = get_sprite('_template').get_at(((mx - camera.x * tile_size.x) % tile_size.x, (my - camera.y * tile_size.y) % tile_size.y))
         
-        # TODO cringe
+        # TODO CRINGE
         match _c.r, _c.g, _c.b:
             case 255, 0, 0:
                 sx -= 1
@@ -129,12 +136,24 @@ def main() -> None:
                 running = False
             
             if camera_drag:
-                # if panning the camera, don't let the window
+                # if panning the camera or dragging a window
                 # manager eat the event
                 event_valid: bool = True
             else:
-                # manager tells whether or not it ate the event
-                event_valid: bool = window_manager.handle_event(event, mx, my)
+                if window_manager.dragging:
+                    # if a window is being dragged, skip
+                    # the button manager
+                    event_valid = True
+                else:
+                    # otherwise, check buttons first
+                    # button manager tells whether or not it ate the event
+                    event_valid: bool = button_manager.handle_event(event, mx, my)
+                
+                if event_valid:
+                    # if the button manager didn't eat the thing or we
+                    # are dragging a window, hand it off to the window manager
+                    # then, window manager tells whether or not it ate the event
+                    event_valid = window_manager.handle_event(event, mx, my)
 
             if event_valid:
                 # we want to process the event here
@@ -146,7 +165,7 @@ def main() -> None:
                         # RMB used on world tile
                         # show WIP status menu
                         tile: Tile = get_tile(sx, sy)
-                        window_manager.add_window(UIStatusMenu(all_text["TITLE_STATUS"], f"{all_text["TERRAIN"]}: {all_text[tile.terrain]}", pygame.Rect(mx - 80, my - 100, 160, 200)))
+                        window_manager.add_status_menu(tile, mx, my)
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 2:
                         # let go of middle mouse so stop dragging
@@ -159,7 +178,7 @@ def main() -> None:
 
         # drawing routine
         # fill the screen the same color as the dark water
-        screen.fill('#000080')
+        screen.fill('#678fcb')
        
         # draw each tile with its corresponding sprite
         for x in range(world_width):
@@ -173,12 +192,11 @@ def main() -> None:
         # draw the windows to the screen
         window_manager.draw(screen)
 
-        # draw each ui button to the screen
-        for button in buttons:
-            button.draw(screen)
+        # draw the buttons to the screen
+        button_manager.draw(screen)
 
         # refresh the window
-        window.flip()
+        button.flip()
 
     # after 'X' is hit, exit cleanly
     pygame.quit()
