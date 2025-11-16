@@ -41,7 +41,7 @@ def main() -> None:
 
     # the actual tiles
     # TODO move to a class along with world size
-    tiles = [[WaterTile(i, j) for i in range(world_width)] for j in range(world_height)]
+    tiles = [[WaterTile(i, j, None) for i in range(world_width)] for j in range(world_height)]
 
     # perlin noise objects
     # TODO no magic numbers
@@ -72,7 +72,7 @@ def main() -> None:
                     t = ForestTile
 
             # setting the tile
-            tiles[y][x] = t(x, y)
+            tiles[y][x] = t(x, y, None)
 
     # UI manager
     window_manager = WindowManager((width, height), [
@@ -80,6 +80,8 @@ def main() -> None:
         UIWindow(all_text["TITLE_TUTORIAL"], all_text["BODY_TUTORIAL"], pygame.Rect(width // 2 - 200, height // 2 - 150, 400, 300)),
     ])
 
+    # buttons
+    # TODO make button manager class
     buttons = [
         UIButton(40, 40, 32, get_sprite("icon_menu")),
         UIButton(120, 40, 32, get_sprite("icon_system"))
