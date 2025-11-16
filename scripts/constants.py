@@ -26,8 +26,19 @@ screen = window.get_surface()
 tile_size = pygame.Vector2(64, 32)
 
 # external sprites
-lines = pygame.image.load("assets/sprites/scanlines_full.png").convert_alpha().subsurface((0, 0, width, height))
 SPRITES = {}
+
+# non-scaled external sprites
+# TODO gross
+for f in [
+    f"assets\\sprites\\icon_{i}.png"
+    for i in ["menu", "system"]
+]:
+    n = f.split('\\')[-1].split('.')[0]
+    SPRITES.update({ n: pygame.image.load(f).convert_alpha() })
+
+# scaled external sprite(s)
+# TODO gross
 for f in ["assets\\sprites\\_template.png"]:
     n = f.split('\\')[-1].split('.')[0]
     SPRITES.update({ n: pygame.transform.scale(pygame.image.load(f).convert_alpha(), tile_size) })

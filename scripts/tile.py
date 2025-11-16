@@ -1,6 +1,5 @@
 class Tile:
     def __init__(self, x, y, gfx):
-        self.entities = []
         self.x, self.y = x, y
         self.graphic = gfx
 

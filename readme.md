@@ -1,6 +1,6 @@
 # PyOpenARCH
 
-PyOpenARCH is a free/open-source grand strategy game set in a fantasy archipelago. The game is written in python and uses the pygame-ce library.
+PyOpenARCH is a free/open-source grand strategy game set in a fantasy archipelago. The game is written in python using the pygame-ce library.
 
 ## Installation
 

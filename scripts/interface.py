@@ -78,8 +78,8 @@ class UIStatusMenu(UIWindow):
         screen.blit(title, (self.rect.x + 10, self.rect.y + 10))
         screen.blit(body, (self.rect.x + 10, self.rect.y + title.height + 30))
 
-# main UI management class
-class UIManager:
+# main window management class
+class WindowManager:
     def __init__(self, size: tuple[int, int], windows: list[UIWindow]):
         self.width, self.height = size
         self.windows = windows
@@ -90,6 +90,10 @@ class UIManager:
         for w in self.windows:
             w.draw(screen)
     
+    def add_window(self, window: UIWindow):
+        self.windows.append(window)
+        self.put_on_top(window)
+
     def put_on_top(self, window: UIWindow):
         # make the selected window have an infinite z value
         window.z_value = float('inf')
@@ -131,5 +135,16 @@ class UIManager:
             # return false because a window ate the click
             return False
     
-        # a window didn't eat the click
+        # no window ate the click
         return True
+
+class UIButton:
+    def __init__(self, x: int, y: int, r: int, icon: pygame.Surface = None):
+        self.position = Vec2(x, y)
+        self.radius = r
+        self.icon = icon
+    
+    def draw(self, screen):
+        pygame.draw.circle(screen, 'black', self.position, self.radius)
+        pygame.draw.circle(screen, 'white', self.position, self.radius, 1)
+        screen.blit(self.icon, (self.position.x - self.icon.width / 2, self.position.y - self.icon.height / 2))

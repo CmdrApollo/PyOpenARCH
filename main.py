@@ -1,7 +1,7 @@
 # all the imports
 import pygame
 import math
-from scripts.window import *
+from scripts.interface import *
 from scripts.constants import *
 from scripts.tile import *
 from scripts.text import *
@@ -75,11 +75,15 @@ def main() -> None:
             tiles[y][x] = t(x, y)
 
     # UI manager
-    manager = UIManager((width, height), [
-        UIWindow(all_text["TITLE_TUTORIAL"], all_text["BODY_TUTORIAL"], pygame.Rect(width // 2 - 200, height // 2 - 150, 400, 300)),
+    window_manager = WindowManager((width, height), [
         UIWindow(all_text["TITLE_WELCOME"], all_text["BODY_WELCOME"], pygame.Rect(width // 2 - 320, height // 2 - 240, 640, 480)),
-        UIWindow("Test", "Another window for testing.", pygame.Rect(width // 2 - 320, height // 2 - 240, 400, 300)),
+        UIWindow(all_text["TITLE_TUTORIAL"], all_text["BODY_TUTORIAL"], pygame.Rect(width // 2 - 200, height // 2 - 150, 400, 300)),
     ])
+
+    buttons = [
+        UIButton(40, 40, 32, get_sprite("icon_menu")),
+        UIButton(120, 40, 32, get_sprite("icon_system"))
+    ]
 
     # main loop
     running = True
@@ -116,7 +120,7 @@ def main() -> None:
                 running = False
             
             # manager tells whether or not it ate the event
-            event_valid: bool = manager.handle_event(event, mx, my)
+            event_valid: bool = window_manager.handle_event(event, mx, my)
 
             if event_valid:
                 # we want to process the event here
@@ -124,9 +128,7 @@ def main() -> None:
                     # RMB used on world tile
                     if event.button == 3:
                         # show WIP status menu
-                        w = UIStatusMenu("Status", "Cabrón", pygame.Rect(mx - 80, my - 100, 160, 200))
-                        manager.windows.append(w)
-                        manager.put_on_top(w)
+                        window_manager.add_window(UIStatusMenu("Status", "Cabrón", pygame.Rect(mx - 80, my - 100, 160, 200)))
 
         # master list of keys
         keys = pygame.key.get_pressed()
@@ -147,20 +149,11 @@ def main() -> None:
 
         # draw the selection marker
         screen.blit(get_sprite('select'), to_screen(sx, sy, camera))
-        
-        # TODO this probably can go
-        for x in range(world_width):
-            for y in range(world_height):
-                for e in tiles[y][x].entities:
-                    screen_x, screen_y = to_screen(x - 1, y - 1, camera)
-                    if e.graphic == 'water':
-                        screen_y + math.sin((x + y) * pygame.time.get_ticks() // 2)
-                    screen.blit(get_sprite(e.graphic), (screen_x, screen_y))
 
-        manager.draw(screen)
+        window_manager.draw(screen)
 
-        # scanlines
-        screen.blit(lines)
+        for button in buttons:
+            button.draw(screen)
 
         # refresh the window
         window.flip()
