@@ -78,6 +78,7 @@ def main() -> None:
     manager = UIManager((width, height), [
         UIWindow(all_text["TITLE_TUTORIAL"], all_text["BODY_TUTORIAL"], pygame.Rect(width // 2 - 200, height // 2 - 150, 400, 300)),
         UIWindow(all_text["TITLE_WELCOME"], all_text["BODY_WELCOME"], pygame.Rect(width // 2 - 320, height // 2 - 240, 640, 480)),
+        UIWindow("Test", "Another window for testing.", pygame.Rect(width // 2 - 320, height // 2 - 240, 400, 300)),
     ])
 
     # main loop
@@ -157,6 +158,9 @@ def main() -> None:
                     screen.blit(get_sprite(e.graphic), (screen_x, screen_y))
 
         manager.draw(screen)
+
+        # scanlines
+        screen.blit(lines)
 
         # refresh the window
         window.flip()

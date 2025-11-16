@@ -26,6 +26,7 @@ screen = window.get_surface()
 tile_size = pygame.Vector2(64, 32)
 
 # external sprites
+lines = pygame.image.load("assets/sprites/scanlines_full.png").convert_alpha().subsurface((0, 0, width, height))
 SPRITES = {}
 for f in ["assets\\sprites\\_template.png"]:
     n = f.split('\\')[-1].split('.')[0]
