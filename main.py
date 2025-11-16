@@ -161,7 +161,7 @@ def main() -> None:
                     if event.button == 2:
                         # middle mouse clicked on world tile
                         camera_drag = True
-                    elif event.button == 3:
+                    elif event.button == 3 and not camera_drag and not window_manager.dragging:
                         # RMB used on world tile
                         # show WIP status menu
                         tile: Tile = get_tile(sx, sy)
