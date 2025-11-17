@@ -116,7 +116,7 @@ def main() -> None:
         sx, sy = to_world(mx, my, camera)
         _c = get_sprite('_template').get_at(((mx - camera.x * tile_size.x) % tile_size.x, (my - camera.y * tile_size.y) % tile_size.y))
         
-        # TODO CRINGE
+        # TODO cringe
         match _c.r, _c.g, _c.b:
             case 255, 0, 0:
                 sx -= 1

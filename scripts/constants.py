@@ -29,19 +29,12 @@ tile_size = pygame.Vector2(64, 32)
 SPRITES = {}
 
 # non-scaled external sprites
-# TODO gross
-for f in [
-    f"assets\\sprites\\icon_{i}.png"
-    for i in ["menu", "journal"]
-]:
-    n = f.split('\\')[-1].split('.')[0]
-    SPRITES.update({ n: pygame.image.load(f).convert_alpha() })
+for f in ["icon_menu", "icon_journal"]:
+    SPRITES.update({ f: pygame.image.load(f"assets\\sprites\\{f}.png").convert_alpha() })
 
 # scaled external sprite(s)
-# TODO gross
-for f in ["assets\\sprites\\_template.png"]:
-    n = f.split('\\')[-1].split('.')[0]
-    SPRITES.update({ n: pygame.transform.scale(pygame.image.load(f).convert_alpha(), tile_size) })
+for f in ["_template"]:
+    SPRITES.update({ f: pygame.transform.scale(pygame.image.load(f"assets\\sprites\\{f}.png").convert_alpha(), tile_size) })
 
 terrain = pygame.image.load("assets\\sprites\\terrain.png").convert_alpha()
 terrain_sprites_per_line = 4
