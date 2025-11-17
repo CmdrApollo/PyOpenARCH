@@ -5,17 +5,20 @@ from scripts.interface import *
 from scripts.constants import *
 from scripts.tile import *
 from scripts.text import *
-
+# star imports stinkyyyyy -rt
 import perlin_noise
 
 # coordinate functions
 # TODO maybe use Vector outputs as well?
+# vector input and output I reckon. -rt
 def to_screen(x: float, y: float, cam: Vec2) -> tuple[float, float]:
     return (
         cam.x * tile_size.x + (x - y) * (tile_size.x // 2),
         cam.y * tile_size.y + (x + y) * (tile_size.y // 2)
     )
 
+
+# vector input and output I reckon. -rt
 def to_world(x: float, y: float, cam: Vec2) -> tuple[float, float]:
     return (
         ((y - cam.y * tile_size.y) // tile_size.y) + ((x - cam.x * tile_size.x) // tile_size.x),
@@ -23,6 +26,7 @@ def to_world(x: float, y: float, cam: Vec2) -> tuple[float, float]:
     )
 
 # the main function that get's called
+# the above comment doesn't tell me anything that isn't implied by the name "main" -rt
 # upon game startup
 def main() -> None:
     # get some global variables
@@ -33,7 +37,7 @@ def main() -> None:
     delta: float = 0.0
 
     # camera variables
-    camera: Vec2 = Vec2(10, -32)
+    camera: Vec2 = Vec2(10, -32) # try to avoid using hard-coded values. whenever possible, create variables at the top of the file with these. this is so that they're easier to find down the line/if multiple people are working at it/it's being used in multiple places. -rt
     camera_drag: bool = False
 
     # world size
@@ -104,6 +108,7 @@ def main() -> None:
     ])
 
     # main loop
+    # prolly split this out to it's own function
     running = True
     while running:
         # calculate delta-time with clock object
