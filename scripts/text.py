@@ -8,7 +8,6 @@ game_text_en = {
     "BODY_TUTORIAL": f"    Welcome to the {gamename} tutorial! To get started, right-click on a tile in the world to view its stats!",
 
     "TITLE_STATUS": "Status",
-    "TERRAIN": "Terrain",
 
     "TILE_BASE": "Unused",
     "TILE_PLAINS": "Plains",
@@ -18,6 +17,11 @@ game_text_en = {
     "TILE_BEACH": "Beach",
     "TILE_OCEAN": "Ocean",
     "TILE_DEEP_OCEAN": "Deep Ocean",
+
+    "SHORTHAND_ATTRACTIVENESS": "At",
+    "SHORTHAND_DEFENSE": "Df",
+    "SHORTHAND_FERTILITY": "Ft",
+    "SHORTHAND_RESOURCES": "Rc",
 }
 
 # Spanish
@@ -28,7 +32,6 @@ game_text_es = {
     "BODY_TUTORIAL": f"    ¡Bienvenidos al tutorial de {gamename}! Para empezar, ¡haz clic derecha por una pieza en el mundo para ver su estado!",
 
     "TITLE_STATUS": "Estado",
-    "TERRAIN": "Tierra",
 
     "TILE_BASE": "No Usado",
     "TILE_PLAINS": "Llanuras",
@@ -38,8 +41,14 @@ game_text_es = {
     "TILE_BEACH": "Playa",
     "TILE_OCEAN": "Océano",
     "TILE_DEEP_OCEAN": "Océano Profundo",
+    
+    # TODO make this the actual spanish
+    "SHORTHAND_ATTRACTIVENESS": "At",
+    "SHORTHAND_DEFENSE": "Df",
+    "SHORTHAND_FERTILITY": "Ft",
+    "SHORTHAND_RESOURCES": "Rc",
 }
 
 # TODO make this a setting that you can change in game
 # default to english
-all_text = game_text_en
+all_text = game_text_es

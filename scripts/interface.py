@@ -100,12 +100,12 @@ class WindowManager:
         self.add_window(
             UIStatusMenu(
                 all_text["TITLE_STATUS"],
-                f"{all_text["TERRAIN"]}: {all_text[tile.terrain]}\n" \
-                f"At: {tile.stats.attractiveness}\n" \
-                f"Df: {tile.stats.defense}\n" \
-                f"Ft: {tile.stats.fertility}\n" \
-                f"Rc: {tile.stats.resources}" ,
-                pygame.Rect(mx - 80, my - 100, 160, 200)
+                f"{all_text[tile.terrain]}\n\n" \
+                f"{all_text["SHORTHAND_ATTRACTIVENESS"]}: {tile.stats.attractiveness}\n" \
+                f"{all_text["SHORTHAND_DEFENSE"]}: {tile.stats.defense}\n" \
+                f"{all_text["SHORTHAND_FERTILITY"]}: {tile.stats.fertility}\n" \
+                f"{all_text["SHORTHAND_RESOURCES"]}: {tile.stats.resources}" ,
+                pygame.Rect(mx - 80, my - 120, 160, 240)
             )
         )
 
