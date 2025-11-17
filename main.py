@@ -179,8 +179,8 @@ def main() -> None:
                         camera.y += event.rel[1] / tile_size.y
 
         # drawing routine
-        # fill the screen the same color as the dark water
-        screen.fill('#000082')
+        # fill the screen with black
+        screen.fill('black')
        
         # draw each tile with its corresponding sprite
         for x in range(world_width):
