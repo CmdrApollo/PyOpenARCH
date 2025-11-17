@@ -1,4 +1,26 @@
-from .colony import *
+import random
+from dataclasses import dataclass
+
+# TODO temp
+# "enum" for stat values
+class TileStat:
+    HIGH = 5
+    MEDIUM = 3
+    LOW = 1
+
+# holder of the 4 stats on tiles
+@dataclass
+class TileStatBlock:
+    attractiveness: int
+    defense       : int
+    fertility     : int
+    resources     : int
+
+# colony class, only used by tiles
+class Colony:
+    def __init__(self, name: str, stats: TileStatBlock):
+        self.name = name
+        self.stats = stats
 
 # base tile class
 class Tile:
@@ -7,6 +29,42 @@ class Tile:
         self.x, self.y = x, y
         self.colony = colony
         self.graphic = gfx
+
+        # generate stats based on terrain
+        stats = TileStatBlock(0, 0, 0, 0)
+        match terrain:
+            case "TILE_BEACH":
+                stats.attractiveness = TileStat.HIGH
+                stats.defense = TileStat.LOW
+                stats.fertility = TileStat.HIGH
+                stats.resources = TileStat.MEDIUM
+            case "TILE_PLAINS":
+                stats.attractiveness = TileStat.HIGH
+                stats.defense = TileStat.MEDIUM
+                stats.fertility = TileStat.HIGH
+                stats.resources = TileStat.LOW
+            case "TILE_FOREST":
+                stats.attractiveness = TileStat.LOW
+                stats.defense = TileStat.HIGH
+                stats.fertility = TileStat.MEDIUM
+                stats.resources = TileStat.HIGH
+            case "TILE_MOUNTAINS":
+                stats.attractiveness = TileStat.MEDIUM
+                stats.defense = TileStat.HIGH
+                stats.fertility = TileStat.LOW
+                stats.resources = TileStat.HIGH
+        
+        # randomly nudge the tile's stats
+        stats.attractiveness += random.randint(-1, 1)
+        stats.defense += random.randint(-1, 1)
+        stats.fertility += random.randint(-1, 1)
+        stats.resources += random.randint(-1, 1)
+
+        # assign stats to self and colony
+        self.stats = stats
+
+        if self.colony is not None:
+            self.colony.stats = self.stats
 
 # TODO unused, maybe get rid of this
 class BaseTile(Tile):
@@ -24,7 +82,7 @@ class ForestTile(Tile):
 
 class MountainTile(Tile):
     def __init__(self, x, y, colony):
-        super().__init__('TILE_MOUNTAIN', x, y, colony, 'mountain')
+        super().__init__('TILE_MOUNTAINS', x, y, colony, 'mountain')
 
 class BeachTile(Tile):
     def __init__(self, x, y, colony):

@@ -97,7 +97,17 @@ class WindowManager:
             w.draw(screen)
     
     def add_status_menu(self, tile: Tile, mx: int, my: int) -> None:
-        self.add_window(UIStatusMenu(all_text["TITLE_STATUS"], f"{all_text["TERRAIN"]}: {all_text[tile.terrain]}", pygame.Rect(mx - 80, my - 100, 160, 200)))
+        self.add_window(
+            UIStatusMenu(
+                all_text["TITLE_STATUS"],
+                f"{all_text["TERRAIN"]}: {all_text[tile.terrain]}\n" \
+                f"At: {tile.stats.attractiveness}\n" \
+                f"Df: {tile.stats.defense}\n" \
+                f"Ft: {tile.stats.fertility}\n" \
+                f"Rc: {tile.stats.resources}" ,
+                pygame.Rect(mx - 80, my - 100, 160, 200)
+            )
+        )
 
     def add_window(self, window: UIWindow) -> None:
         window.to_remove = False
