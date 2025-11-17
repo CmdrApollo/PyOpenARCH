@@ -22,10 +22,9 @@ class ForestTile(Tile):
     def __init__(self, x, y, colony):
         super().__init__('TILE_FOREST', x, y, colony, 'forest')
 
-# TODO unused
-class FarmlandTile(Tile):
+class MountainTile(Tile):
     def __init__(self, x, y, colony):
-        super().__init__('TILE_FARMLAND', x, y, colony, 'dirt')
+        super().__init__('TILE_MOUNTAIN', x, y, colony, 'mountain')
 
 class BeachTile(Tile):
     def __init__(self, x, y, colony):

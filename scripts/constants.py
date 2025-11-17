@@ -51,7 +51,7 @@ for i, name in enumerate([
         'base',
         'grass',
         'forest',
-        'dirt',
+        'mountain',
         'sand',
         'water',
         'deep_water',

@@ -68,11 +68,13 @@ def main() -> None:
                 t = OceanTile
             elif n < 0.52:
                 t = BeachTile
-            else:
+            elif n < 0.625:
                 if forest_noise((x / world_width, y / world_height)) < 0:
                     t = PlainsTile
                 else:
                     t = ForestTile
+            else:
+                t = MountainTile
 
             # setting the tile
             tiles[y * world_width + x] = t(x, y, None)
@@ -178,7 +180,7 @@ def main() -> None:
 
         # drawing routine
         # fill the screen the same color as the dark water
-        screen.fill('#678fcb')
+        screen.fill('#000082')
        
         # draw each tile with its corresponding sprite
         for x in range(world_width):

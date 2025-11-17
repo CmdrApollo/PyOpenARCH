@@ -13,6 +13,7 @@ game_text_en = {
     "TILE_BASE": "Unused",
     "TILE_PLAINS": "Plains",
     "TILE_FOREST": "Forest",
+    "TILE_MOUNTAIN": "Mountains",
     "TILE_FARMLAND": "Farmland",
     "TILE_BEACH": "Beach",
     "TILE_OCEAN": "Ocean",
@@ -32,6 +33,7 @@ game_text_es = {
     "TILE_BASE": "No Usado",
     "TILE_PLAINS": "Llanuras",
     "TILE_FOREST": "Bosque",
+    "TILE_MOUNTAIN": "Montañas",
     "TILE_FARMLAND": "Campo",
     "TILE_BEACH": "Playa",
     "TILE_OCEAN": "Océano",
@@ -40,4 +42,4 @@ game_text_es = {
 
 # TODO make this a setting that you can change in game
 # default to english
-all_text = game_text_es
+all_text = game_text_en
