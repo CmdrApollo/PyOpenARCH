@@ -97,6 +97,7 @@ class WindowManager:
             w.draw(screen)
     
     def add_status_menu(self, tile: Tile, mx: int, my: int) -> None:
+        # TODO temp!!!
         self.add_window(
             UIStatusMenu(
                 all_text["TITLE_STATUS"],

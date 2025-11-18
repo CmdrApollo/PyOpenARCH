@@ -51,4 +51,4 @@ game_text_es = {
 
 # TODO make this a setting that you can change in game
 # default to english
-all_text = game_text_es
+all_text = game_text_en
