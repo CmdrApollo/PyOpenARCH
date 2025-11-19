@@ -9,9 +9,10 @@
 
 The following are vaguely in order of importance. More will be added as I think of it.
 
+- [ ] Putting the world in its own class
 - [ ] Performing actions
     - [ ] UI for selecting actions (tab-based?)
-    - [ ] Removal of action Point
+    - [ ] Removal of action point
     - [ ] Carrying out the action (function hook / class inheritance?)
 - [ ] Electing governors
     - [ ] Governor stats / action lists
@@ -28,3 +29,6 @@ The following are vaguely in order of importance. More will be added as I think 
 - [ ] Art for each season
 - [ ] Random name generation
 - [ ] "Are You Sure?" Re-Usable popup
+- [ ] Audio
+    - [ ] SFX
+    - [ ] Music
