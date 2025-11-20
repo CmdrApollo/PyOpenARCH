@@ -1,23 +1,24 @@
 # all the imports
 import pygame
 import math
-from scripts.interface import *
-from scripts.constants import *
-from scripts.tile import *
-from scripts.text import *
-
+import random
 import perlin_noise
 
+from scripts.interface import UIButton, UIWindow, ButtonManager, WindowManager
+from scripts.tile import Tile, OceanTile, DeepOceanTile, BeachTile, PlainsTile, ForestTile, MountainTile
+from scripts.text import all_text
+from scripts.factions import Faction
+from scripts.constants import *
+
 # coordinate functions
-# TODO maybe use Vector outputs as well?
-def to_screen(x: float, y: float, cam: Vec2) -> tuple[float, float]:
-    return (
+def to_screen(x: float, y: float, cam: Vec2) -> Vec2:
+    return Vec2(
         cam.x * tile_size.x + (x - y) * (tile_size.x // 2),
         cam.y * tile_size.y + (x + y) * (tile_size.y // 2)
     )
 
-def to_world(x: float, y: float, cam: Vec2) -> tuple[float, float]:
-    return (
+def to_world(x: float, y: float, cam: Vec2) -> Vec2:
+    return Vec2(
         ((y - cam.y * tile_size.y) // tile_size.y) + ((x - cam.x * tile_size.x) // tile_size.x),
         ((y - cam.y * tile_size.y) // tile_size.y) - ((x - cam.x * tile_size.x) // tile_size.x)
     )
@@ -33,18 +34,42 @@ def main() -> None:
     delta: float = 0.0
 
     # camera variables
-    camera: Vec2 = Vec2(10, -32)
+    camera: Vec2 = Vec2(0, 0)
     camera_drag: bool = False
 
     # world size
-    world_width: int = 80
-    world_height: int = 80
+    world_width: int = 128
+    world_height: int = 128
+
+    # faction variables
+    num_factions: int = 6
+
+    faction_colors: list[str] = [
+        'red',
+        'orange',
+        'yellow',
+        'green',
+        'blue',
+        'purple'
+    ]
+
+    factions: list[Faction] = [
+        Faction(
+            chr(65 + i),
+            faction_colors[i],
+            random.randint(0, world_width - 1),
+            random.randint(0, world_height - 1)
+        )
+        for i in range(num_factions)
+    ]
+
+    show_factions: bool = False
 
     # the actual tiles
     # TODO move to a class along with world size
     # generate ocean tiles by converting a one-dimensional
     # i-value to an (x,y) coordinate
-    tiles: list[Tile] = [OceanTile(i % world_width, i // world_width, None) for i in range(world_width * world_height)]
+    tiles: list[Tile] = [OceanTile(i % world_width, i // world_width, None, None) for i in range(world_width * world_height)]
 
     # perlin noise objects
     # TODO no magic numbers
@@ -69,15 +94,26 @@ def main() -> None:
             elif n < 0.52:
                 t = BeachTile
             elif n < 0.625:
-                if forest_noise((x / world_width, y / world_height)) < 0:
+                # set either plains or forest based on the secondary noise source
+                if forest_noise.noise((x / world_width, y / world_height)) < 0:
                     t = PlainsTile
                 else:
                     t = ForestTile
             else:
                 t = MountainTile
 
+            closest_faction: Faction = None
+            closest_distance: float = float('inf')
+
+            for f in factions:
+                d = math.sqrt(pow(f.home_x - x, 2) + pow(f.home_y - y, 2))
+                
+                if d < closest_distance:
+                    closest_distance = d
+                    closest_faction = f
+
             # setting the tile
-            tiles[y * world_width + x] = t(x, y, None)
+            tiles[y * world_width + x] = t(x, y, closest_faction, None)
 
     # helper for doing silly math
     def get_tile(x: int, y: int) -> Tile:
@@ -93,6 +129,7 @@ def main() -> None:
     ])
 
     # function for the journal button
+    # TODO temp
     def show_welcome():
         if welcome_window not in window_manager.windows:
             window_manager.add_window(welcome_window)
@@ -102,6 +139,34 @@ def main() -> None:
         UIButton(40, 40, 32, get_sprite("icon_menu")),
         UIButton(120, 40, 32, get_sprite("icon_journal"), show_welcome)
     ])
+
+    max_screen_x = max_screen_y = 0
+    min_screen_x = min_screen_y = 1_000_000 # arbitrary big number
+
+    # TODO this is a weird hack with the +2/+1, but it fixes an issue
+    for x in range(world_width + 2):
+        for y in range(world_height + 1):
+            sx, sy = to_screen(x, y, Vec2(0, 0))
+
+            max_screen_x = max(max_screen_x, sx)
+            min_screen_x = min(min_screen_x, sx)
+
+            max_screen_y = max(max_screen_y, sy)
+            min_screen_y = min(min_screen_y, sy)
+
+    surf_width, surf_height = max_screen_x - min_screen_x, max_screen_y - min_screen_y
+    start_cam = Vec2(-min_screen_x // tile_size.x, -min_screen_y // tile_size.y)
+
+    world_surface = pygame.Surface((surf_width, surf_height))
+    factions_surface = pygame.Surface((surf_width, surf_height), pygame.SRCALPHA)
+
+    # generate the necessary world surfaces
+    for x in range(world_width):
+        for y in range(world_height):
+            world_surface.blit(get_sprite(get_tile(x, y).graphic), to_screen(x, y, start_cam))
+            factions_surface.blit(get_tile(x, y).faction.surface, to_screen(x, y, start_cam))
+
+    draw_start_tile = to_world(0, 0, start_cam)
 
     # main loop
     running = True
@@ -182,15 +247,21 @@ def main() -> None:
                         camera.x += event.rel[0] / tile_size.x
                         camera.y += event.rel[1] / tile_size.y
 
+        # master list of keys
+        keys = pygame.key.get_pressed()
+
+        # show_factions is only true if tab is pressed
+        show_factions = keys[pygame.K_TAB]
+
         # drawing routine
         # fill the screen with black
         screen.fill('black')
        
-        # draw each tile with its corresponding sprite
-        for x in range(world_width):
-            for y in range(world_height):
-                screen_x, screen_y = to_screen(x, y, camera)
-                screen.blit(get_sprite(get_tile(x, y).graphic), (screen_x, screen_y))
+        # draw the world
+        screen.blit(world_surface, to_screen(*draw_start_tile, camera))
+        # if instructed, draw the factions
+        if show_factions:
+            screen.blit(factions_surface, to_screen(*draw_start_tile, camera))
 
         # draw the selection marker
         screen.blit(get_sprite('select'), to_screen(sx, sy, camera))
