@@ -22,8 +22,8 @@ The following are vaguely in order of importance. More will be added as I think 
         - [ ] UI for assigning governors
 - [ ] Ability to have buttons that appear inside of UI windows
 - [ ] Ability to choose starting location
-- [-] Generation of multiple nations (Voronoi)
-- [ ] Visualization of different nations
+- [x] Generation of multiple nations (Voronoi)
+- [x] Visualization of different nations
 
 ## Other
 
