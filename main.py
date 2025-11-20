@@ -42,15 +42,19 @@ def main() -> None:
     world_height: int = 128
 
     # faction variables
-    num_factions: int = 6
+    num_factions: int = 9
 
     faction_colors: list[str] = [
         'red',
         'orange',
         'yellow',
         'green',
+        'forestgreen',
         'blue',
-        'purple'
+        'indigo',
+        'purple',
+        'pink',
+        'white',
     ]
 
     factions: list[Faction] = [
@@ -154,18 +158,22 @@ def main() -> None:
             max_screen_y = max(max_screen_y, sy)
             min_screen_y = min(min_screen_y, sy)
 
+    # calculate stuff for the surfaces to be generated
+    # namely size and start position
     surf_width, surf_height = max_screen_x - min_screen_x, max_screen_y - min_screen_y
     start_cam = Vec2(-min_screen_x // tile_size.x, -min_screen_y // tile_size.y)
 
+    # the surfaces themselves
     world_surface = pygame.Surface((surf_width, surf_height))
     factions_surface = pygame.Surface((surf_width, surf_height), pygame.SRCALPHA)
 
-    # generate the necessary world surfaces
+    # draw onto the world surfaces
     for x in range(world_width):
         for y in range(world_height):
             world_surface.blit(get_sprite(get_tile(x, y).graphic), to_screen(x, y, start_cam))
             factions_surface.blit(get_tile(x, y).faction.surface, to_screen(x, y, start_cam))
 
+    # important for drawing the world
     draw_start_tile = to_world(0, 0, start_cam)
 
     # main loop

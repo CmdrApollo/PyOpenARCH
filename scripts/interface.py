@@ -185,7 +185,7 @@ class UIButton:
     def draw(self, screen: pygame.Surface) -> None:
         # draw a black circle with a white outline
         pygame.draw.circle(screen, 'black', self.position, self.radius)
-        pygame.draw.circle(screen, 'white', self.position, self.radius, 1)
+        pygame.draw.aacircle(screen, 'white', self.position, self.radius, 2)
         if self.icon is not None:
             # blit the icon to the screen if it exists
             screen.blit(self.icon, (self.position.x - self.icon.width / 2, self.position.y - self.icon.height / 2))
