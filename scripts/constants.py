@@ -19,8 +19,8 @@ gamename = "PyOpenARCH"
 
 # window/drawing setup
 width, height = 1600, 900
-button = pygame.Window(title=gamename, size=(width, height))
-screen = button.get_surface()
+window = pygame.Window(title=gamename, size=(width, height))
+screen = window.get_surface()
 
 # tile constants
 tile_size = pygame.Vector2(64, 32)

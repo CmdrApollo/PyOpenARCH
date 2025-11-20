@@ -37,8 +37,8 @@ def main() -> None:
     camera_drag: bool = False
 
     # world size
-    world_width: int = 100
-    world_height: int = 100
+    world_width: int = 80
+    world_height: int = 80
 
     # the actual tiles
     # TODO move to a class along with world size
@@ -108,6 +108,10 @@ def main() -> None:
     while running:
         # calculate delta-time with clock object
         delta = clock.tick_busy_loop(60.0) / 1000.0
+
+        # avoid divide by 0 errors
+        if delta != 0:
+            window.title = f"{gamename} | {(1.0 / delta):.1f}fps"
 
         # get mouse position at the start of the frame
         mx, my = pygame.mouse.get_pos()
@@ -198,7 +202,7 @@ def main() -> None:
         button_manager.draw(screen)
 
         # refresh the window
-        button.flip()
+        window.flip()
 
     # after 'X' is hit, exit cleanly
     pygame.quit()
