@@ -44,15 +44,20 @@ for i, name in enumerate([
         'base',
         'grass',
         'forest',
+        'farmland',
         'mountain',
         'sand',
         'water',
         'deep_water',
-        'select',
     ]):
     x = i % terrain_sprites_per_line
     y = i // terrain_sprites_per_line
     SPRITES.update({name: terrain.subsurface((x * tile_size.x, y * tile_size.y, tile_size.x, tile_size.y))})
+
+select = SPRITES['base'].copy()
+select.fill('cyan', special_flags=pygame.BLEND_RGB_MULT)
+select.set_alpha(128)
+SPRITES.update({'select': select})
 
 # helper functions
 def clamp(a: float, b: float, c: float) -> float:

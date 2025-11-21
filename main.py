@@ -71,9 +71,7 @@ def main() -> None:
 
     # the actual tiles
     # TODO move to a class along with world size
-    # generate ocean tiles by converting a one-dimensional
-    # i-value to an (x,y) coordinate
-    tiles: list[Tile] = [OceanTile(i % world_width, i // world_width, None, None) for i in range(world_width * world_height)]
+    tiles: list[Tile] = [None for _ in range(world_width * world_height)]
 
     # perlin noise objects
     # TODO no magic numbers
@@ -106,6 +104,7 @@ def main() -> None:
             else:
                 t = MountainTile
 
+            # figure out the closest faction hq so it can be assigned
             closest_faction: Faction = None
             closest_distance: float = float('inf')
 
