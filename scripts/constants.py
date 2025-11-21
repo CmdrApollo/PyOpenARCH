@@ -14,12 +14,14 @@ small_font = pygame.font.Font(fontname, 16)
 font = pygame.font.Font(fontname, 20)
 big_font = pygame.font.Font(fontname, 24)
 
-# the name of the game
+# important game variables
 gamename = "PyOpenARCH"
+gameversion = "v0.0.1"
+gamenameandversion = f"{gamename} {gameversion}"
 
 # window/drawing setup
 width, height = 1600, 900
-window = pygame.Window(title=gamename, size=(width, height))
+window = pygame.Window(title=gamenameandversion, size=(width, height))
 screen = window.get_surface()
 
 # tile constants
