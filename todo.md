@@ -9,7 +9,8 @@
 
 The following are vaguely in order of importance. More will be added as I think of it.
 
-- [ ] Putting the world in its own class
+- [ ] Modularize as much as possible
+    - [x] Putting the world in its own class
 - [ ] Performing actions
     - [ ] UI for selecting actions (tab-based?)
     - [ ] Removal of action point

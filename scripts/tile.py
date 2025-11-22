@@ -83,6 +83,10 @@ class PlainsTile(Tile):
     def __init__(self, x: int, y: int, faction: Faction | None, colony: Colony | None):
         super().__init__('TILE_PLAINS', x, y, faction, colony, 'grass')
 
+class FarmlandTile(Tile):
+    def __init__(self, x: int, y: int, faction: Faction | None, colony: Colony | None):
+        super().__init__('TILE_FARMLAND', x, y, faction, colony, 'farmland')
+
 class ForestTile(Tile):
     def __init__(self, x: int, y: int, faction: Faction | None, colony: Colony | None):
         super().__init__('TILE_FOREST', x, y, faction, colony, 'forest')

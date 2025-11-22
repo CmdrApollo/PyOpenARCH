@@ -68,3 +68,16 @@ def clamp(a: float, b: float, c: float) -> float:
 def get_sprite(s: str) -> pygame.Surface:
     spr: pygame.Surface = SPRITES[s]
     return spr
+
+# coordinate functions
+def to_screen(x: float, y: float, cam: Vec2) -> Vec2:
+    return Vec2(
+        cam.x * tile_size.x + (x - y) * (tile_size.x // 2),
+        cam.y * tile_size.y + (x + y) * (tile_size.y // 2)
+    )
+
+def to_world(x: float, y: float, cam: Vec2) -> Vec2:
+    return Vec2(
+        ((y - cam.y * tile_size.y) // tile_size.y) + ((x - cam.x * tile_size.x) // tile_size.x),
+        ((y - cam.y * tile_size.y) // tile_size.y) - ((x - cam.x * tile_size.x) // tile_size.x)
+    )
